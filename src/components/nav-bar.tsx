@@ -1,4 +1,8 @@
-export function NavBar() {
+import { auth } from '@/lib/auth';
+
+export async function NavBar() {
+  const session = await auth();
+
   return (
     <div className='navbar bg-base-100'>
       <div className='flex-1'>
@@ -6,12 +10,15 @@ export function NavBar() {
       </div>
       <div className='flex-none'>
         <ul className='menu menu-horizontal px-1'>
-          <li>
-            <a>Sign In</a>
-          </li>
-          <li>
-            <a>Sign Out</a>
-          </li>
+          {session?.user ? (
+            <li>
+              <a href='/api/auth/signout'>Sign Out</a>
+            </li>
+          ) : (
+            <li>
+              <a href='/api/auth/signin'>Sign In</a>
+            </li>
+          )}
         </ul>
       </div>
     </div>
