@@ -5,7 +5,14 @@ export async function NavBar() {
 
   const items = (
     <li>
-      <a href='/games'>Games</a>
+      <details>
+        <summary>Browse</summary>
+        <ul className='p-2'>
+          <li>
+            <a>Games</a>
+          </li>
+        </ul>
+      </details>
     </li>
   );
 
