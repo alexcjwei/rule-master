@@ -1,7 +1,9 @@
 'use client';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function UploadFileForm(props: { gameId: string }) {
+  const router = useRouter();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,6 +28,7 @@ export default function UploadFileForm(props: { gameId: string }) {
 
         if (response.ok) {
           console.log('File uploaded successfully');
+          router.refresh();
         } else {
           console.error('Failed to upload file');
         }

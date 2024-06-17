@@ -1,3 +1,4 @@
+import GameChatInterace from '@/components/game-chat-interface';
 import UploadFileForm from '@/components/upload-file-form';
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
@@ -33,6 +34,7 @@ export default async function GameDetail({
         ))}
       </ul>
       {session?.user?.role === 'admin' && <UploadFileForm gameId={params.id} />}
+      <GameChatInterace gameId={id} />
     </div>
   );
 }

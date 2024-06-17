@@ -15,8 +15,10 @@
     "@aws-sdk/lib-storage": "^3.598.0",
     "@neondatabase/serverless": "^0.9.3",
     "@prisma/adapter-neon": "^5.15.0",
+    "langchain": "^0.2.5",
     "next": "14.2.4",
     "next-auth": "^5.0.0-beta.19",
+    "openai": "^4.51.0",
     "react": "^18",
     "react-dom": "^18",
     "server-only": "^0.0.1"

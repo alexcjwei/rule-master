@@ -1,6 +1,5 @@
 import prisma from '@/lib/prisma';
-import { formatS3Key } from '@/lib/utils';
-import { s3Client, S3_BUCKET_NAME } from '@/lib/s3';
+import { s3Client, S3_BUCKET_NAME, formatS3Key } from '@/lib/s3';
 import { Upload } from '@aws-sdk/lib-storage';
 
 export async function POST(request: Request) {
