@@ -1,6 +1,6 @@
 import { auth } from '@/lib/auth';
 
-export async function NavBar() {
+export default async function NavBar() {
   const session = await auth();
 
   const items = (

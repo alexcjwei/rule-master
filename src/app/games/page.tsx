@@ -1,13 +1,16 @@
 import prisma from '@/lib/prisma';
+import Link from 'next/link';
 
-export default async function GamesPage() {
+export default async function GamesList() {
   const games = await prisma.game.findMany();
 
   return (
     <div>
       <ul>
         {games.map((game) => (
-          <li key={game.id}>{game.title}</li>
+          <li key={game.id}>
+            <Link href={`/games/${game.id}`}>{game.title}</Link>
+          </li>
         ))}
       </ul>
     </div>
