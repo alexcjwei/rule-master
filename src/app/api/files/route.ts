@@ -13,19 +13,23 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Create File
-    const f = await prisma.file.create({
-      data: {
-        name: file.name,
-        game: { connect: { id: gameId } },
-      },
-    });
+    const newFile = await prisma.$transaction(async (prisma) => {
+      // Create new File
+      const newFile = await prisma.file.create({
+        data: {
+          name: file.name,
+          game: { connect: { id: gameId } },
+        },
+      });
 
-    // Update File S3 Key
-    const fkey = formatS3Key(f.id, file.name);
-    await prisma.file.update({
-      where: { id: f.id },
-      data: { key: fkey },
+      // Update File with S3 Key
+      const fkey = formatS3Key(newFile.id, file.name);
+      const updatedFile = await prisma.file.update({
+        where: { id: newFile.id },
+        data: { key: fkey },
+      });
+
+      return updatedFile;
     });
 
     // Create file in S3 under key
@@ -33,7 +37,7 @@ export async function POST(request: Request) {
       client: s3Client,
       params: {
         Bucket: S3_BUCKET_NAME,
-        Key: fkey,
+        Key: newFile.key || formatS3Key(newFile.id, file.name),
         Body: file.stream(),
         ContentType: 'application/pdf',
       },

@@ -6,6 +6,7 @@ export default async function GamesList() {
 
   return (
     <div>
+      <p>Games:</p>
       <ul>
         {games.map((game) => (
           <li key={game.id}>
