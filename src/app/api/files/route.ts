@@ -1,6 +1,6 @@
 import prisma from '@/lib/prisma';
 import { formatS3Key } from '@/lib/utils';
-import { s3Client, bucketName } from '@/lib/s3';
+import { s3Client, S3_BUCKET_NAME } from '@/lib/s3';
 import { Upload } from '@aws-sdk/lib-storage';
 
 export async function POST(request: Request) {
@@ -32,9 +32,10 @@ export async function POST(request: Request) {
     const upload = await new Upload({
       client: s3Client,
       params: {
-        Bucket: bucketName,
+        Bucket: S3_BUCKET_NAME,
         Key: fkey,
         Body: file.stream(),
+        ContentType: 'application/pdf',
       },
     }).done();
 

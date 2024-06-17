@@ -1,6 +1,7 @@
 import UploadFileForm from '@/components/upload-file-form';
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { getObjectURLFromKey } from '@/lib/s3';
 
 export default async function GameDetail({
   params,
@@ -17,14 +18,21 @@ export default async function GameDetail({
     where: { id },
     include: { files: true },
   });
+
   return (
     <div>
-      <p>My Game: {game?.title}</p>
+      <p>Title: {game?.title}</p>
       <p>Game Files:</p>
-      {game?.files.map((file) => (
-        <div key={file.id}>{file.name}</div>
-      ))}
-      {session?.user?.role == 'admin' && <UploadFileForm gameId={params.id} />}
+      <ul>
+        {game?.files.map((file) => (
+          <li key={file.id}>
+            <a href={getObjectURLFromKey(file.key)} target='_blank'>
+              {file.name}
+            </a>
+          </li>
+        ))}
+      </ul>
+      {session?.user?.role === 'admin' && <UploadFileForm gameId={params.id} />}
     </div>
   );
 }
