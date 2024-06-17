@@ -11,12 +11,7 @@ if (process.env.NODE_ENV === 'production') {
   openai = new OpenAI();
 } else {
   if (!global.openai) {
-    console.log(process.env.OPENAI_API_KEY);
-    global.openai = new OpenAI({
-      apiKey:
-        process.env.OPENAI_API_KEY ||
-        'sk-proj-v8KeCVKxF2z3QPxDOgXwT3BlbkFJorIcztYY4oz2WzqrV2Ys',
-    });
+    global.openai = new OpenAI();
   }
   openai = global.openai;
 }

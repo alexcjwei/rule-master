@@ -42,6 +42,8 @@ model Document {
   fileId  Int                   @map("file_id")
   content String
   vector  Unsupported("vector")
+
+  @@map("documents")
 }
 
 model User {
