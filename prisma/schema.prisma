@@ -22,13 +22,15 @@ model Game {
 }
 
 model File {
-  id        Int      @id @default(autoincrement())
-  name      String
-  key       String?
-  game      Game     @relation(fields: [gameId], references: [id])
-  gameId    Int      @map("game_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id          Int      @id @default(autoincrement())
+  name        String
+  key         String?
+  game        Game     @relation(fields: [gameId], references: [id])
+  gameId      Int      @map("game_id")
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdById String?  @map("created_by_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   @@map("files")
 }
@@ -45,6 +47,7 @@ model User {
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  File      File[]
 
   @@map("users")
 }
