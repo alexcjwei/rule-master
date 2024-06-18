@@ -37,11 +37,14 @@ model File {
 }
 
 model Document {
-  id      String                @id @default(cuid())
-  file    File                  @relation(fields: [fileId], references: [id])
-  fileId  Int                   @map("file_id")
-  content String
-  vector  Unsupported("vector")
+  id        String                       @id @default(cuid())
+  text      String
+  embedding Unsupported("vector(1536)")?
+  metadata  Json?
+  file      File                         @relation(fields: [fileId], references: [id])
+  fileId    Int                          @map("file_id")
+  createdAt DateTime                     @default(now()) @map("created_at")
+  updatedAt DateTime                     @updatedAt @map("updated_at")
 
   @@map("documents")
 }

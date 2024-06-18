@@ -27,4 +27,16 @@ async function getChatCompletion(
   return chatCompletion.choices[0].message.content;
 }
 
-export { getChatCompletion };
+async function getEmbedding(
+  text: string,
+  model: string = 'text-embedding-3-small'
+) {
+  text = text.replace('\n', ' ');
+  const response = await openai.embeddings.create({
+    input: text,
+    model: model,
+  });
+  return response.data[0].embedding;
+}
+
+export { getChatCompletion, getEmbedding };
