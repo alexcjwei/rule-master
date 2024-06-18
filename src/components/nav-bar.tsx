@@ -56,7 +56,7 @@ export default async function NavBar() {
             Sign Out
           </a>
         ) : (
-          <a className='btn' href='api/auth/signin'>
+          <a className='btn' href='/api/auth/signin'>
             Sign In
           </a>
         )}
