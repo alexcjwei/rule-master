@@ -1,4 +1,4 @@
-import { File } from '@prisma/client';
+import { File, Document } from '@prisma/client';
 import { s3Client, S3_BUCKET_NAME } from '@/lib/s3';
 import { GetObjectCommand } from '@aws-sdk/client-s3';
 import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf';
@@ -60,11 +60,20 @@ async function insertFile(file: File) {
   }
 }
 
-function search(text: string, n: number = 8): string[] {
-  // Make embedding from text
-  // Select top n similar embeddings
-  // Return the corresponding text
-  return [];
+async function search(
+  text: string,
+  gameId: number,
+  n: number = 8
+): Promise<string[]> {
+  const embedding = await getEmbedding(text);
+  const result = (await prisma.$queryRaw`
+    SELECT * from documents
+    LEFT JOIN files ON documents.file_id = files.id
+    WHERE files.game_id = ${gameId}
+    ORDER BY embedding <=> ${`[${embedding.join(',')}]`}
+    LIMIT ${n}
+  `) as any[];
+  return result.map((row) => row.text) as string[];
 }
 
 export { insertFile, search };
