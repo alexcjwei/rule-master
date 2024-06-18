@@ -1,8 +1,11 @@
 import prisma from '@/lib/prisma';
 import { s3Client, S3_BUCKET_NAME, formatS3Key } from '@/lib/s3';
 import { Upload } from '@aws-sdk/lib-storage';
+import { middleware } from '@/middleware';
 
 export async function POST(request: Request) {
+  const session = await middleware();
+  const user = session?.user?.user;
   const formData = await request.formData();
   const file = formData.get('file') as File;
   const gameId = Number(formData.get('gameId'));
@@ -18,6 +21,7 @@ export async function POST(request: Request) {
         data: {
           name: file.name,
           game: { connect: { id: gameId } },
+          createdBy: { connect: { id: user?.id } },
         },
       });
 
