@@ -32,6 +32,7 @@ async function insertFile(file: File) {
     throw new Error(`File ${file.key} has no body`);
   }
 
+  // Get the file and split it from S3
   const arrayBuffer = await response.Body.transformToByteArray();
   const blob = new Blob([arrayBuffer]);
   const loader = new PDFLoader(blob);
@@ -66,4 +67,4 @@ function search(text: string, n: number = 8): string[] {
   return [];
 }
 
-export { insertFileById, search };
+export { insertFile, search };
