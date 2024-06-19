@@ -7,11 +7,15 @@ export default function AddGameForm() {
 
   return (
     <form action={createGame}>
-      <h2>Add Game</h2>
-      <label htmlFor='title'>Title</label>
-      <input type='text' id='title' name='title' />
-      <button type='submit' disabled={pending}>
-        {pending ? 'Creating...' : 'Create'}
+      <input
+        type='text'
+        placeholder='Enter game title'
+        id='title'
+        name='title'
+        className='input'
+      />
+      <button type='submit' disabled={pending} className='btn'>
+        {pending ? 'Adding...' : 'Add'}
       </button>
     </form>
   );

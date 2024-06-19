@@ -8,7 +8,7 @@ function GameRow({ game }: { game: Game }) {
         <Link href={`/games/${game.id}`}>{game.title}</Link>
       </th>
       <td>{game.createdAt.toLocaleDateString()}</td>
-      <td>{game.updatedAt.toLocaleTimeString()}</td>
+      <td>{game.updatedAt.toLocaleDateString()}</td>
     </tr>
   );
 }
