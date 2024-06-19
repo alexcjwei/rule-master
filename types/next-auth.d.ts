@@ -1,17 +1,17 @@
-// // Ref: https://authjs.dev/getting-started/typescript#module-augmentation
-// import { DefaultSession, DefaultUser } from 'next-auth';
+// Ref: https://authjs.dev/getting-started/typescript#module-augmentation
+import { DefaultSession, DefaultUser } from 'next-auth';
 
-// declare module 'next-auth' {
-//   /**
-//    * Returned by `auth`, `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
-//    */
-//   interface Session {
-//     user: {
-//       role: string;
-//     } & DefaultSession;
-//   }
+declare module 'next-auth' {
+  /**
+   * Returned by `auth`, `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
+   */
+  interface Session {
+    user: {
+      role: string;
+    } & DefaultSession['user'];
+  }
 
-//   interface User extends DefaultUser {
-//     role: string;
-//   }
-// }
+  interface User extends DefaultUser {
+    role: string;
+  }
+}
