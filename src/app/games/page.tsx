@@ -1,19 +1,16 @@
+import AddGameForm from '@/components/add-game-form';
 import prisma from '@/lib/prisma';
-import Link from 'next/link';
+import { auth } from '@/lib/auth';
+import GamesTable from '@/components/games-table';
 
 export default async function GamesList() {
+  const session = await auth();
   const games = await prisma.game.findMany();
 
   return (
     <div>
-      <p>Games:</p>
-      <ul>
-        {games.map((game) => (
-          <li key={game.id}>
-            <Link href={`/games/${game.id}`}>{game.title}</Link>
-          </li>
-        ))}
-      </ul>
+      {session?.user?.role === 'admin' && <AddGameForm />}
+      <GamesTable games={games} />
     </div>
   );
 }

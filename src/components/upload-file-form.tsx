@@ -1,53 +1,16 @@
 'use client';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { uploadFile } from '@/actions';
+import { useFormStatus } from 'react-dom';
 
 export default function UploadFileForm(props: { gameId: string }) {
-  const router = useRouter();
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      setSelectedFile(event.target.files[0]);
-    }
-  };
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (selectedFile) {
-      const formData = new FormData();
-      formData.append('file', selectedFile);
-      formData.append('gameId', props.gameId);
-
-      try {
-        const response = await fetch('/api/files', {
-          method: 'POST',
-          body: formData,
-        });
-
-        if (response.ok) {
-          console.log('File uploaded successfully');
-          router.refresh();
-        } else {
-          console.error('Failed to upload file');
-        }
-      } catch (error) {
-        console.error('Failed to upload file', error);
-      }
-    }
-  };
+  const { pending } = useFormStatus();
 
   return (
-    <form onSubmit={handleSubmit} encType='multipart/form-data'>
-      <input
-        type='file'
-        name='file'
-        accept='.pdf'
-        onChange={handleFileChange}
-      />
-      <button type='submit' className='btn'>
-        Upload
+    <form action={uploadFile}>
+      <input type='hidden' name='gameId' value={props.gameId} />
+      <input type='file' name='file' accept='.pdf' />
+      <button disabled={pending} type='submit' className='btn'>
+        {!!pending ? 'Uploading...' : 'Upload'}
       </button>
     </form>
   );
