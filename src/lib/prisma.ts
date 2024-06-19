@@ -2,25 +2,17 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaNeon } from '@prisma/adapter-neon';
 import { Pool } from '@neondatabase/serverless';
 
-let prisma: PrismaClient;
-
-declare global {
-  var prisma: PrismaClient;
-}
-
-const createPrismaClient = () => {
+const getPrisma = () => {
   const neon = new Pool({ connectionString: process.env.POSTGRES_PRISMA_URL });
   const adapter = new PrismaNeon(neon);
-  const prisma = new PrismaClient({ adapter });
+  const prisma = new PrismaClient({
+    adapter,
+    log:
+      process.env.NODE_ENV === 'development' ? ['query', 'info', 'warn'] : [],
+  });
   return prisma;
 };
 
-if (process.env.NODE_ENV === 'production') {
-  prisma = createPrismaClient();
-} else {
-  if (!global.prisma) {
-    global.prisma = createPrismaClient();
-  }
-  prisma = global.prisma;
-}
+const prisma = getPrisma();
+
 export default prisma;
