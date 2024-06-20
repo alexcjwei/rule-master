@@ -1,5 +1,5 @@
 import prisma from '@/lib/prisma';
-import { s3Client, S3_BUCKET_NAME, formatS3Key } from '@/lib/s3';
+import { s3Client, S3_BUCKET_NAME, putFile } from '@/lib/s3';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 
 export async function POST(request: Request) {
@@ -21,27 +21,14 @@ export async function POST(request: Request) {
         },
       });
 
-      // Update file S3 key using the ID
-      const fkey = formatS3Key(newFile.id, file.name);
-      const updatedFile = await prisma.file.update({
-        where: { id: newFile.id },
-        data: { key: fkey },
-      });
-
-      if (!updatedFile.key) {
-        throw new Error(`File ${newFile.id} has no key`);
+      // Upload file contents to S3
+      if (!newFile.key) {
+        throw new Error('File key not generated');
       }
 
-      // Upload file contents to S3
-      const command = new PutObjectCommand({
-        Bucket: S3_BUCKET_NAME,
-        Key: updatedFile.key,
-        Body: Buffer.from(await file.arrayBuffer()),
-        ContentType: file.type,
-      });
-      await s3Client.send(command);
+      await putFile(file, newFile.key);
 
-      return updatedFile;
+      return newFile;
     });
     return Response.json(newFile, { status: 200 });
   } catch (error) {

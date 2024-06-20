@@ -22,7 +22,7 @@ model Game {
 model File {
   id          Int        @id @default(autoincrement())
   name        String
-  key         String?
+  key         String     @unique @default(cuid())
   game        Game       @relation(fields: [gameId], references: [id])
   gameId      Int        @map("game_id")
   createdBy   User?      @relation(fields: [createdById], references: [id])
