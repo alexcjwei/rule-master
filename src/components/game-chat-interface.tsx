@@ -26,7 +26,8 @@ export default function GameChatInterace(props: { gameId: number }) {
     setInputValue(event.target.value);
   };
 
-  const handleSendMessage = async () => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (inputValue.trim() !== '') {
       const newMessages = [
         ...messages,
@@ -35,18 +36,22 @@ export default function GameChatInterace(props: { gameId: number }) {
       setMessages(newMessages);
       setInputValue('');
 
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          gameId: props.gameId,
-          chatHistory: newMessages,
-        }),
-      });
-      const chatCompletion = (await res.json()) as ChatMessage;
-      setMessages([...newMessages, chatCompletion]);
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            gameId: props.gameId,
+            chatHistory: newMessages,
+          }),
+        });
+        const chatCompletion = (await res.json()) as ChatMessage;
+        setMessages([...newMessages, chatCompletion]);
+      } catch (error) {
+        console.error(error);
+      }
     }
   };
 
@@ -56,7 +61,7 @@ export default function GameChatInterace(props: { gameId: number }) {
         {messages.map((message, index) => (
           <ChatMessageItem key={index} message={message} />
         ))}
-        <form onSubmit={handleSendMessage} className='form-control flex-row'>
+        <form onSubmit={handleSubmit} className='form-control flex-row'>
           <input
             type='text'
             placeholder='Message RuleMaster'

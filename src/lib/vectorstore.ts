@@ -69,13 +69,13 @@ async function search(
   const embedding = await getEmbedding(text);
   const embeddingString = `[${embedding.join(',')}]`;
   const result = (await prisma.$queryRaw`
-    SELECT * from documents
+    SELECT text from documents
     LEFT JOIN files ON documents.file_id = files.id
     WHERE files.game_id = ${gameId}
     ORDER BY embedding <=> ${embeddingString}::vector
     LIMIT ${n}
   `) as any[];
-  return result.map((row) => row.text) as string[];
+  return result.map((row) => row.text);
 }
 
 export { insertFile, search };
