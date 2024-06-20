@@ -9,13 +9,15 @@ interface ChatMessage {
   content: string;
 }
 
-function formatPrompt(prompt: string, context: string[]): ChatMessage {
+function formatPromptInTemplate(
+  prompt: string,
+  context: string[]
+): ChatMessage {
   return {
     role: Role.HUMAN,
     content: `Use the following pieces of retrieved context to answer the question.
   If you don't know the answer, just say that you don't know. 
-  You may use context from previous messages to inform your answer.
-  Keep the answer concise.
+  Reference the context in your answer. Answer the question thoroughly and concisely.
 
   QUESTION:
   ${prompt}
@@ -43,4 +45,4 @@ function insertSystemMessage(
   return [systemMessage, ...messages];
 }
 
-export { type ChatMessage, Role, formatPrompt, insertSystemMessage };
+export { type ChatMessage, Role, formatPromptInTemplate, insertSystemMessage };
