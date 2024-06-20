@@ -12,6 +12,7 @@ export async function POST(request: Request) {
   }
 
   try {
+    console.log('Creating file in db...');
     const newFile = await prisma.$transaction(async (prisma) => {
       // Create new File
       const newFile = await prisma.file.create({
@@ -32,7 +33,7 @@ export async function POST(request: Request) {
     });
 
     // Create file in S3 under key
-    const upload = await new Upload({
+    const upload = new Upload({
       client: s3Client,
       params: {
         Bucket: S3_BUCKET_NAME,
@@ -40,10 +41,14 @@ export async function POST(request: Request) {
         Body: file.stream(),
         ContentType: 'application/pdf',
       },
-    }).done();
+    });
 
-    // Pinecone
-    console.log('Upload successful', upload);
+    console.log('Uploading file to S3...', upload);
+    upload.on('httpUploadProgress', (progress) => {
+      console.log(`Uploaded ${progress.loaded} of ${progress.total} bytes`);
+    });
+    await upload.done();
+    console.log('Upload successful');
   } catch (error) {
     console.error('Failed to create file', error);
     return new Response(null, { status: 500 });

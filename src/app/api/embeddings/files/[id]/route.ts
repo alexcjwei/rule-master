@@ -25,3 +25,30 @@ export async function POST(
 
   return new Response(null, { status: 200 });
 }
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  const fileId = Number(params.id);
+  if (isNaN(fileId)) {
+    return new Response(null, { status: 400 });
+  }
+  const file = await prisma.file.findUnique({
+    where: { id: fileId },
+  });
+  if (!file) {
+    return new Response(null, { status: 404 });
+  }
+
+  try {
+    await prisma.document.deleteMany({
+      where: { fileId },
+    });
+  } catch (error) {
+    console.error('Failed to delete file embeddings', error);
+    return new Response(null, { status: 500 });
+  }
+
+  return new Response(null, { status: 200 });
+}

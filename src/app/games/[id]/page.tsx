@@ -1,8 +1,8 @@
+import FilesTable from '@/components/files-table';
 import GameChatInterace from '@/components/game-chat-interface';
 import UploadFileForm from '@/components/upload-file-form';
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
-import { getObjectURLFromKey } from '@/lib/s3';
 
 export default async function GameDetail({
   params,
@@ -20,20 +20,15 @@ export default async function GameDetail({
     include: { files: true },
   });
 
+  if (!game) {
+    return <div>Game not found</div>;
+  }
+
   return (
     <div>
-      <p>Title: {game?.title}</p>
-      <p>Game Files:</p>
-      <ul>
-        {game?.files.map((file) => (
-          <li key={file.id}>
-            <a href={getObjectURLFromKey(file.key)} target='_blank'>
-              {file.name}
-            </a>
-          </li>
-        ))}
-      </ul>
+      <h1 className='text-xl'>{game.title}</h1>
       {session?.user?.role === 'admin' && <UploadFileForm gameId={params.id} />}
+      <FilesTable files={game?.files} />
       <GameChatInterace gameId={id} />
     </div>
   );

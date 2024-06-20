@@ -40,24 +40,25 @@ async function insertFile(file: File) {
   const splitter = new RecursiveCharacterTextSplitter();
   const splitDocs = await splitter.splitDocuments(docs);
 
-  // Insert into the vector store
-  for (const doc of splitDocs) {
-    const embedding = await getEmbedding(doc.pageContent);
-    // const embeddingString = `[${embedding.join(',')}]`;
-    await prisma.$transaction(async (prisma) => {
-      const row = await prisma.document.create({
-        data: {
-          fileId: file.id,
-          text: doc.pageContent,
-        },
-      });
-      await prisma.$executeRaw`
+  await prisma.$transaction(async (prisma) => {
+    return await Promise.all(
+      splitDocs.map(async (doc) => {
+        const embedding = await getEmbedding(doc.pageContent);
+        const embeddingString = `[${embedding.join(',')}]`;
+        const row = await prisma.document.create({
+          data: {
+            fileId: file.id,
+            text: doc.pageContent,
+          },
+        });
+        await prisma.$executeRaw`
         UPDATE documents
-        SET embedding = ${`[${embedding.join(',')}]`}
+        SET embedding = ${embeddingString}::vector
         WHERE id = ${row.id}
       `;
-    });
-  }
+      })
+    );
+  });
 }
 
 async function search(
@@ -66,11 +67,12 @@ async function search(
   n: number = 8
 ): Promise<string[]> {
   const embedding = await getEmbedding(text);
+  const embeddingString = `[${embedding.join(',')}]`;
   const result = (await prisma.$queryRaw`
     SELECT * from documents
     LEFT JOIN files ON documents.file_id = files.id
     WHERE files.game_id = ${gameId}
-    ORDER BY embedding <=> ${`[${embedding.join(',')}]`}
+    ORDER BY embedding <=> ${embeddingString}::vector
     LIMIT ${n}
   `) as any[];
   return result.map((row) => row.text) as string[];
