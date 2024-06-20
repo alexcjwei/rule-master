@@ -23,42 +23,49 @@ async function insertFile(file: File) {
     throw new Error(`File ${file.id} has no key`);
   }
 
-  const command = new GetObjectCommand({
-    Bucket: S3_BUCKET_NAME,
-    Key: file.key,
-  });
-  const response = await s3Client.send(command);
-  if (!response.Body) {
-    throw new Error(`File ${file.key} has no body`);
+  try {
+    console.log('Getting file from S3...');
+    const command = new GetObjectCommand({
+      Bucket: S3_BUCKET_NAME,
+      Key: file.key,
+    });
+    const response = await s3Client.send(command);
+    if (!response.Body) {
+      throw new Error(`File ${file.key} has no body`);
+    }
+
+    // Get the file and split it from S3
+    console.log('Splitting file...');
+    const arrayBuffer = await response.Body.transformToByteArray();
+    const blob = new Blob([arrayBuffer]);
+    const loader = new PDFLoader(blob);
+    const docs = await loader.load();
+    const splitter = new RecursiveCharacterTextSplitter();
+    const splitDocs = await splitter.splitDocuments(docs);
+
+    console.log('Creating embeddings...');
+    await prisma.$transaction(async (prisma) => {
+      return await Promise.all(
+        splitDocs.map(async (doc) => {
+          const embedding = await getEmbedding(doc.pageContent);
+          const embeddingString = `[${embedding.join(',')}]`;
+          const row = await prisma.document.create({
+            data: {
+              fileId: file.id,
+              text: doc.pageContent,
+            },
+          });
+          await prisma.$executeRaw`
+          UPDATE documents
+          SET embedding = ${embeddingString}::vector
+          WHERE id = ${row.id}
+        `;
+        })
+      );
+    });
+  } catch (error) {
+    throw error;
   }
-
-  // Get the file and split it from S3
-  const arrayBuffer = await response.Body.transformToByteArray();
-  const blob = new Blob([arrayBuffer]);
-  const loader = new PDFLoader(blob);
-  const docs = await loader.load();
-  const splitter = new RecursiveCharacterTextSplitter();
-  const splitDocs = await splitter.splitDocuments(docs);
-
-  await prisma.$transaction(async (prisma) => {
-    return await Promise.all(
-      splitDocs.map(async (doc) => {
-        const embedding = await getEmbedding(doc.pageContent);
-        const embeddingString = `[${embedding.join(',')}]`;
-        const row = await prisma.document.create({
-          data: {
-            fileId: file.id,
-            text: doc.pageContent,
-          },
-        });
-        await prisma.$executeRaw`
-        UPDATE documents
-        SET embedding = ${embeddingString}::vector
-        WHERE id = ${row.id}
-      `;
-      })
-    );
-  });
 }
 
 async function search(
