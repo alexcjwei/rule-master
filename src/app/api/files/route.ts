@@ -21,38 +21,31 @@ export async function POST(request: Request) {
         },
       });
 
-      // Update File S3 Key
+      // Update file S3 key using the ID
       const fkey = formatS3Key(newFile.id, file.name);
       const updatedFile = await prisma.file.update({
         where: { id: newFile.id },
         data: { key: fkey },
       });
 
+      if (!updatedFile.key) {
+        throw new Error(`File ${newFile.id} has no key`);
+      }
+
+      // Upload file contents to S3
+      const command = new PutObjectCommand({
+        Bucket: S3_BUCKET_NAME,
+        Key: updatedFile.key,
+        Body: Buffer.from(await file.arrayBuffer()),
+        ContentType: file.type,
+      });
+      await s3Client.send(command);
+
       return updatedFile;
     });
-
-    if (!newFile.key) {
-      throw new Error(`File ${newFile.id} has no key`);
-    }
-
-    // Create file in S3 under key
-    console.log('Uploading file', newFile.id);
-    const command = new PutObjectCommand({
-      Bucket: S3_BUCKET_NAME,
-      Key: newFile.key,
-      Body: Buffer.from(await file.arrayBuffer()),
-      ContentType: file.type,
-    });
-    try {
-      await s3Client.send(command);
-    } catch (error) {
-      console.error('Failed to upload file to s3', error);
-      return new Response(null, { status: 500 });
-    }
+    return Response.json(newFile, { status: 200 });
   } catch (error) {
     console.error('Failed to create file', error);
     return new Response(null, { status: 500 });
   }
-
-  return new Response(null, { status: 200 });
 }
