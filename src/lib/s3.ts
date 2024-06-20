@@ -3,9 +3,10 @@ import { NodeJsClient } from '@smithy/types';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 
 const S3_BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME || '';
+const S3_BUCKET_REGION = process.env.AWS_S3_BUCKET_REGION || 'us-west-2';
 
 const s3Client = new S3Client({
-  region: 'us-east-1',
+  region: S3_BUCKET_REGION,
 }) as NodeJsClient<S3Client>;
 
 function getObjectURLFromKey(key: string | null) {
