@@ -42,7 +42,7 @@ export default function UploadFileForm(props: { gameId: string }) {
     <form
       onSubmit={handleSubmit}
       encType='multipart/form-data'
-      className='form-control'
+      className='form-control flex-row'
     >
       <input
         type='file'
@@ -51,11 +51,7 @@ export default function UploadFileForm(props: { gameId: string }) {
         onChange={handleFileChange}
         className='file-input'
       />
-      <button
-        type='submit'
-        disabled={!selectedFile}
-        className='btn max-w-[200px]'
-      >
+      <button type='submit' disabled={!selectedFile} className='btn'>
         Upload
       </button>
     </form>

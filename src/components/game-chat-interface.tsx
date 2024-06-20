@@ -56,16 +56,18 @@ export default function GameChatInterace(props: { gameId: number }) {
         {messages.map((message, index) => (
           <ChatMessageItem key={index} message={message} />
         ))}
-        <input
-          type='text'
-          placeholder='Message RuleMaster'
-          value={inputValue}
-          onChange={handleInputChange}
-          className='input input-bordered w-full max-w-lg'
-        />
-        <button onClick={handleSendMessage} className='btn mx-2'>
-          Send
-        </button>
+        <form onSubmit={handleSendMessage} className='form-control flex-row'>
+          <input
+            type='text'
+            placeholder='Message RuleMaster'
+            value={inputValue}
+            onChange={handleInputChange}
+            className='input input-bordered w-full max-w-lg'
+          />
+          <button type='submit' className='btn mx-2' disabled={!inputValue}>
+            Send
+          </button>
+        </form>
       </div>
     </div>
   );
