@@ -9,7 +9,9 @@ async function FileRow({ file }: { file: File }) {
   return (
     <tr>
       <th>
-        <a href={getObjectURLFromKey(file.key)}>{file.name}</a>
+        <a href={getObjectURLFromKey(file.key)} target='_blank'>
+          {file.name}
+        </a>
         {session?.user?.role === 'admin' && (
           <TriggerEmbedding fileId={file.id} />
         )}

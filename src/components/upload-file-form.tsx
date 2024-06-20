@@ -1,8 +1,9 @@
 'use client';
 import { useState } from 'react';
-import { revalidatePath } from 'next/cache';
+import { useRouter } from 'next/navigation';
 
 export default function UploadFileForm(props: { gameId: string }) {
+  const router = useRouter();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -20,12 +21,17 @@ export default function UploadFileForm(props: { gameId: string }) {
       formData.append('gameId', props.gameId);
 
       try {
-        await fetch('/api/files', {
+        const response = await fetch('/api/files', {
           method: 'POST',
           body: formData,
         });
 
-        revalidatePath(`/games/${props.gameId}`);
+        if (response.ok) {
+          console.log('File uploaded successfully');
+          router.refresh();
+        } else {
+          console.error('Failed to upload file');
+        }
       } catch (error) {
         console.error('Failed to upload file', error);
       }
@@ -38,8 +44,6 @@ export default function UploadFileForm(props: { gameId: string }) {
       encType='multipart/form-data'
       className='form-control'
     >
-      <h2 className='text-l'>Upload New File</h2>
-      <input type='hidden' name='gameId' value={props.gameId} />
       <input
         type='file'
         name='file'
@@ -47,7 +51,11 @@ export default function UploadFileForm(props: { gameId: string }) {
         onChange={handleFileChange}
         className='file-input'
       />
-      <button type='submit' disabled={!selectedFile} className='btn'>
+      <button
+        type='submit'
+        disabled={!selectedFile}
+        className='btn max-w-[200px]'
+      >
         Upload
       </button>
     </form>
