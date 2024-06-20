@@ -1,6 +1,5 @@
 import prisma from '@/lib/prisma';
-import { s3Client, S3_BUCKET_NAME, putFile } from '@/lib/s3';
-import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { putFile } from '@/lib/s3';
 
 export async function POST(request: Request) {
   const formData = await request.formData();
