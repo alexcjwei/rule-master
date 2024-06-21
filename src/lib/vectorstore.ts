@@ -1,22 +1,10 @@
-import { File, Document } from '@prisma/client';
+import { File } from '@prisma/client';
 import { s3Client, S3_BUCKET_NAME } from '@/lib/s3';
 import { GetObjectCommand } from '@aws-sdk/client-s3';
 import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import { getEmbedding } from '@/lib/openai';
 import prisma from '@/lib/prisma';
-
-async function insertFileById(id: number) {
-  const file = await prisma.file.findUnique({
-    where: { id },
-  });
-
-  if (!file) {
-    throw new Error(`File ${id} not found`);
-  }
-
-  return insertFile(file);
-}
 
 async function insertFile(file: File) {
   if (!file.key) {
@@ -37,15 +25,17 @@ async function insertFile(file: File) {
     // Get the file and split it from S3
     console.log('Loading file...');
     const arrayBuffer = await response.Body.transformToByteArray();
+    console.log('Loaded', arrayBuffer.byteLength, 'bytes from S3');
     const blob = new Blob([arrayBuffer]);
     const loader = new PDFLoader(blob);
     const docs = await loader.load();
+    console.log('Loaded', docs.length, 'pages from PDF');
 
     console.log('Splitting document file...');
     const splitter = new RecursiveCharacterTextSplitter();
     const splitDocs = await splitter.splitDocuments(docs);
 
-    console.log('Creating embeddings...');
+    console.log(`Creating embeddings for ${splitDocs.length} documents...`);
     await prisma.$transaction(async (tx) => {
       return await Promise.all(
         splitDocs.map(async (doc) => {
@@ -57,16 +47,14 @@ async function insertFile(file: File) {
               text: doc.pageContent,
             },
           });
-          const result = await tx.$executeRaw`
+          await tx.$executeRaw`
           UPDATE documents
           SET embedding = ${embeddingString}::vector
           WHERE id = ${row.id};
         `;
-          console.log(result);
         })
       );
     });
-    console.log('Created embeddings.');
   } catch (error) {
     console.error('Failed to create embeddings');
     throw error;
