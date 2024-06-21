@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     const possibleAnswer = await getChatCompletion([
       {
         role: Role.HUMAN,
-        content: `Given the question, make up a possible answer. Be concise and keep your answer to less than 3 sentences.
+        content: `Given the question about a board game, make up a possible answer. Be concise and keep your answer to less than 3 sentences.
         QUESTION:
       ${lastMessage.content}
 

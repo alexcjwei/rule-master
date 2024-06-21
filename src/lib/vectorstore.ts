@@ -35,11 +35,13 @@ async function insertFile(file: File) {
     }
 
     // Get the file and split it from S3
-    console.log('Splitting file...');
+    console.log('Loading file...');
     const arrayBuffer = await response.Body.transformToByteArray();
     const blob = new Blob([arrayBuffer]);
     const loader = new PDFLoader(blob);
     const docs = await loader.load();
+
+    console.log('Splitting document file...');
     const splitter = new RecursiveCharacterTextSplitter();
     const splitDocs = await splitter.splitDocuments(docs);
 
@@ -63,7 +65,9 @@ async function insertFile(file: File) {
         })
       );
     });
+    console.log('Created embeddings.');
   } catch (error) {
+    console.error('Failed to create embeddings');
     throw error;
   }
 }
