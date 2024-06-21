@@ -46,22 +46,23 @@ async function insertFile(file: File) {
     const splitDocs = await splitter.splitDocuments(docs);
 
     console.log('Creating embeddings...');
-    await prisma.$transaction(async (prisma) => {
+    await prisma.$transaction(async (tx) => {
       return await Promise.all(
         splitDocs.map(async (doc) => {
           const embedding = await getEmbedding(doc.pageContent);
           const embeddingString = `[${embedding.join(',')}]`;
-          const row = await prisma.document.create({
+          const row = await tx.document.create({
             data: {
               fileId: file.id,
               text: doc.pageContent,
             },
           });
-          await prisma.$executeRaw`
+          const result = await tx.$executeRaw`
           UPDATE documents
           SET embedding = ${embeddingString}::vector
-          WHERE id = ${row.id}
+          WHERE id = ${row.id};
         `;
+          console.log(result);
         })
       );
     });
