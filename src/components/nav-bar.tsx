@@ -7,9 +7,9 @@ export default async function NavBar() {
     <li>
       <details>
         <summary>Browse</summary>
-        <ul className='p-2'>
+        <ul className='p-2 z-50'>
           <li>
-            <a href='/games'>All Boardgames</a>
+            <a href='/games'>Boardgames</a>
           </li>
         </ul>
       </details>
@@ -38,7 +38,7 @@ export default async function NavBar() {
           </div>
           <ul
             tabIndex={0}
-            className='menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52'
+            className='menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box'
           >
             {items}
           </ul>
