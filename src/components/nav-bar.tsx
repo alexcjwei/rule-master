@@ -43,7 +43,7 @@ export default async function NavBar() {
             {items}
           </ul>
         </div>
-        <a className='btn btn-ghost text-xl' href='/landing'>
+        <a className='btn btn-ghost text-xl' href='/'>
           RuleMaster
         </a>
       </div>

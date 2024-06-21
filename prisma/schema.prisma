@@ -23,7 +23,7 @@ model File {
   id          Int        @id @default(autoincrement())
   name        String
   key         String     @unique @default(cuid())
-  game        Game       @relation(fields: [gameId], references: [id])
+  game        Game       @relation(fields: [gameId], references: [id], onDelete: Cascade)
   gameId      Int        @map("game_id")
   createdBy   User?      @relation(fields: [createdById], references: [id])
   createdById String?    @map("created_by_id")
@@ -39,7 +39,7 @@ model Document {
   text      String
   embedding Unsupported("vector(1536)")?
   metadata  Json?
-  file      File                         @relation(fields: [fileId], references: [id])
+  file      File                         @relation(fields: [fileId], references: [id], onDelete: Cascade)
   fileId    Int                          @map("file_id")
   createdAt DateTime                     @default(now()) @map("created_at")
   updatedAt DateTime                     @updatedAt @map("updated_at")
