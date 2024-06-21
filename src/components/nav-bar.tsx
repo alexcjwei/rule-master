@@ -9,7 +9,7 @@ export default async function NavBar() {
         <summary>Browse</summary>
         <ul className='p-2'>
           <li>
-            <a href='/games'>Games</a>
+            <a href='/games'>All Boardgames</a>
           </li>
         </ul>
       </details>
