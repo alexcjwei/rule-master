@@ -16,8 +16,16 @@ function formatPromptInTemplate(
   return {
     role: Role.HUMAN,
     content: `Use the following pieces of retrieved context to answer the question.
-  If you don't know the answer, just say that you don't know. 
-  Reference the context in your answer. Answer the question thoroughly and concisely.
+  If you don't know the answer, just say that you don't know. Answer the question thoroughly and concisely.
+  Use the format below by answering the question then providing supporting evidence through quotes taken verbatim from the context.
+
+  FORMATTING:
+  <Answer to the question, fewer than 3 sentences>
+
+  Citations:
+  - <Quote 1 from retrieved context>
+  - ...
+
 
   QUESTION:
   ${prompt}
