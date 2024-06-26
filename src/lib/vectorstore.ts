@@ -72,7 +72,7 @@ async function search(
     SELECT text from documents
     LEFT JOIN files ON documents.file_id = files.id
     WHERE files.game_id = ${gameId}
-    ORDER BY embedding <=> ${embeddingString}::vector
+    ORDER BY 1 - (embedding <=> ${embeddingString}::vector) DESC
     LIMIT ${n}
   `) as any[];
   return result.map((row) => row.text);

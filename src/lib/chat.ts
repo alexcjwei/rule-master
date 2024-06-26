@@ -15,23 +15,30 @@ function formatPromptInTemplate(
 ): ChatMessage {
   return {
     role: Role.HUMAN,
-    content: `Use the following pieces of retrieved context to answer the question.
-  If you don't know the answer, just say that you don't know. Answer the question thoroughly and concisely.
-  Use the format below by answering the question then providing supporting evidence through quotes taken verbatim from the context.
+    content: `You will be provided with a question and some retrieved context from a boardgame rulebook.
+  Answer the question by providing quotes taken verbatim from the context, and a short summary of the answer.
+  If you can't answer the question based on the context, just say that you don't know.
+  Answer the question accurately, using only the provided pieces of context to answer the question.
+
+  Use the format below when answering. The quotes must be verbatim from the retrieved pieces of context.
+  Order the quotes in order of importance for answering the question.
 
   FORMATTING:
-  <Answer to the question, fewer than 3 sentences>
-
-  Citations:
-  - <Quote 1 from retrieved context>
+  Source(s):
+  - <Quote 1>
+  - <Quote 2>
   - ...
+
+  Answer: <Your summarized answer>
 
 
   QUESTION:
   ${prompt}
 
+
   CONTEXT:
   ${context.join('\n')}
+
 
   ANSWER:
   `,
