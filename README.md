@@ -4,6 +4,8 @@ RuleMaster is a retrieval-augmented generation (RAG) system for answering board 
 
 To build RuleMaster, I learned how to create a full-stack storage, query, and retrieval system. Notably, I learned how to combine Prisma, Postgres, and pg_vector to store and query vector embeddings. I also learned how to use AWS S3 to store the rulebook PDFs.
 
+Should be live here: https://rule-master-20920cb331ec.herokuapp.com/
+
 ## Tools
 
 - [React](https://reactjs.org/)
